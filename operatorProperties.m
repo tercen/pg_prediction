@@ -1,0 +1,4 @@
+function props = operatorProperties()
+props = { };
+     
+            
