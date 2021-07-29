@@ -1,0 +1,147 @@
+function ppr_prediction_main(arglist)
+
+
+[params, exitCode] = parse_arguments(arglist);
+
+if exitCode == 0
+    % Read data and training results
+    [ exitCode] = ppr_io_read_params_json(params.infile);
+    
+end
+
+if exitCode == 0
+    global TrainingResults;
+    % GROUP IS EMPTY
+    [exitCode, X, y, spotID, strLabel] = ppr_data_format();
+    
+end
+classifier = TrainingResults;
+
+if ~isequal(spotID, classifier.spotID)
+%     error('Spot ID''s of the saved classifier do not correspond to that of the new data');
+    exitCode = -14;
+    ppr_util_error_message(exitCode);
+end
+
+cr = cvResults;
+cr.partitionType = 'Not applicable';
+cr.models        = classifier.finalModel;
+cr.sampleNames   = strLabel;
+cr.group         = y;
+
+if ~isempty(cr.group)
+    cr.title = 'Test set validation results';
+else
+    cr.title = 'New sample prediction results';
+end
+[cr.yPred, cr.cPred] = classifier.finalModel.predict(X);
+cr.y = round(cr.yPred);
+
+
+global TrainingDataFile
+[name,path] = uigetfile(filter, 'Open a classifier', dftName);
+if name == 0
+    error('A classifier must be selected');
+end
+lastUsed = fullfile(path,name);
+
+% SAVING Results
+
+global OutputFile;
+ppr_io_save_results(cr, lastUsed);
+
+% SAVE cr
+
+% Save cr and lastUsed
+
+% Save aHeader and aNumeric
+
+% %text output to file
+% fname = [datestr(now,30),'PredictionResults.xls'];
+% fpath = fullfile(folder, fname);
+% fid = fopen(fpath, 'w');
+% if fid == -1
+%     error('Unable to open file for writing results')
+% end
+% try
+%     cr.print(fid);
+%     fclose(fid);
+% catch
+%     fclose(fid);
+%     error(lasterr)
+% end
+% save run data
+% runDataFile = fullfile(folder, 'classPredictRunData.mat');
+% save(runDataFile, 'cr', 'lastUsed');
+% output formatting for return to BN
+% aHeader{1} = 'rowSeq';
+% aNumeric(:,1) = double(data.rowSeq);
+% aHeader{2} = 'colSeq';
+% aNumeric(:,2) = double(data.colSeq);
+% lIdx = sub2ind(size(X'), data.rowSeq, data.colSeq); % linear index for converting matrix to flat output
+% for i=1:length(classifier.finalModel.uGroup)
+%     aHeader{2+i} = ['y', char(classifier.finalModel.uGroup(i))];
+%     yPred = repmat(cr.yPred(:,i)', size(X,2),1);
+%     aNumeric(:, 2 + i) = yPred(lIdx);
+% end
+% if length(classifier.finalModel.uGroup) == 2
+%     aHeader{size(aNumeric,2)+ 1} = 'PamIndex';
+%     yPred = repmat(cr.yPred(:,2)', size(X,2), 1);
+%     pamIndex = 2 * yPred -1;
+%     aNumeric(:, size(aNumeric,2)+1) = pamIndex(lIdx);
+% end
+
+fprintf('Program finished with error code %d\n', exitCode);
+
+end % END of function pamsoft_grid
+
+
+
+function [params, exitCode] = parse_arguments(argline)
+    exitCode = 0;
+    params   = struct;
+    if isempty(argline)
+        exitCode = -1000;
+        pg_error_message(exitCode);
+        return
+    end
+    
+    argStrIdx   = strfind(argline, '--');
+    argStrValid = regexp(argline, '--infile=.+', 'ONCE');
+    
+    if isempty(argStrValid) 
+        exitCode = -1000;
+        pg_error_message(exitCode);
+        return
+    end
+
+    % @TODO Create regex validation of the parameter passed to ensure the
+    % code below works with the expected format
+    
+    nArgs     = length(argStrIdx);
+
+    for i = 1:nArgs-1
+        arg = argline(argStrIdx(i)+2:argStrIdx(i+1)-1);
+        arg = strrep(arg, '-', '');
+        
+        if contains( arg, '=' ) 
+            [argName, argVal] = strtok(arg, '=');
+        else
+            [argName, argVal] = strtok(arg, ' ');
+        end
+        
+        params.(argName) = strtrim(argVal(2:end));
+       
+    end
+    
+    arg = argline(argStrIdx(end)+2:end);
+    arg = strrep(arg, '-', '');
+    
+    if contains( arg, '=' ) 
+        [argName, argVal] = strtok(arg, '=');
+    else
+        [argName, argVal] = strtok(arg, ' ');
+    end
+
+    params.(argName) = strtrim(argVal(2:end));
+end
