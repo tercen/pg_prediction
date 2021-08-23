@@ -28,47 +28,47 @@ function [aNumeric, aHeader] = dataFrameOperator(folder)
 %2. Tab delimited text file (.xls, best viewed using MS-Excel) with details
 % on predictions and classifier performance (only when grouping is
 % available).
-global data
-%% Predict
-%# function mgPlsda
-%% input formatting and checking
-if length(unique(data.QuantitationType)) ~= 1
-    error('Predict cannot handle multiple quantitation types');
-end
-% predictor matrix
-X = flat2mat(data.value, data.rowSeq, data.colSeq)';
-if any(isnan(X(:)))
-    error('Missing values are not allowed');
-end
-% response variable
-varType     = get(data, 'VarDescription');
-varNames    = get(data, 'VarNames');
-yName = varNames(contains(varType, 'Color'));
-if length(yName) > 1 
-    error('Grouping must be defined using exactly one data color');
-end
-if ~isempty(yName)
-    yName = char(yName);
-    y = flat2ColumnAnnotation(data.(yName), data.rowSeq, data.colSeq);
-else
-    y = [];
-end
-% retrieve spot ID's for later use
-bID = strcmp('Spot', varType) & strcmp('ID', varNames);
-if sum(bID) ~= 1
-    error('Spot ID could not be retrieved')
-end
-spotID = flat2RowAnnotation(data.ID, data.rowSeq, data.colSeq);
-% create sample labels
-labelIdx = find(contains(varType, 'Array'));
-for i=1:length(labelIdx)
-    label(:,i) = nominal(flat2ColumnAnnotation(data.(varNames{labelIdx(i)}), data.rowSeq, data.colSeq));
-    % (creating a nominal nicely handles different types of experimental
-    % factors)
-end
-for i=1:size(label,1)
-    strLabel{i} =paste(cellstr(label(i,:)), '/');
-end
+% global data
+% %% Predict
+% %# function mgPlsda
+% %% input formatting and checking
+% if length(unique(data.QuantitationType)) ~= 1
+%     error('Predict cannot handle multiple quantitation types');
+% end
+% % predictor matrix
+% X = flat2mat(data.value, data.rowSeq, data.colSeq)';
+% if any(isnan(X(:)))
+%     error('Missing values are not allowed');
+% end
+% % response variable
+% varType     = get(data, 'VarDescription');
+% varNames    = get(data, 'VarNames');
+% yName = varNames(contains(varType, 'Color'));
+% if length(yName) > 1 
+%     error('Grouping must be defined using exactly one data color');
+% end
+% if ~isempty(yName)
+%     yName = char(yName);
+%     y = flat2ColumnAnnotation(data.(yName), data.rowSeq, data.colSeq);
+% else
+%     y = [];
+% end
+% % retrieve spot ID's for later use
+% bID = strcmp('Spot', varType) & strcmp('ID', varNames);
+% if sum(bID) ~= 1
+%     error('Spot ID could not be retrieved')
+% end
+% spotID = flat2RowAnnotation(data.ID, data.rowSeq, data.colSeq);
+% % create sample labels
+% labelIdx = find(contains(varType, 'Array'));
+% for i=1:length(labelIdx)
+%     label(:,i) = nominal(flat2ColumnAnnotation(data.(varNames{labelIdx(i)}), data.rowSeq, data.colSeq));
+%     % (creating a nominal nicely handles different types of experimental
+%     % factors)
+% end
+% for i=1:size(label,1)
+%     strLabel{i} =paste(cellstr(label(i,:)), '/');
+% end
 %% Propmt for saved classifier and load
 fpath = fullfile(folder, 'classPredictRunData.mat');
 if exist(fpath, 'file')
