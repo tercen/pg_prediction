@@ -7,6 +7,7 @@ global TrainingDataFile
 global OutputFile
 global OutputFileMat
 global QuantitationType
+global TrainingResults;
 
 OutputFile       = '';
 OutputFileMat    = '';
@@ -76,7 +77,7 @@ try
                 QuantitationType = param.QUANTITATIONTYPE;
             end
             
-            
+
             if isfield(param, 'TRAININGDATAFILE')
                 TrainingDataFile = param.TRAININGDATAFILE;
                 
@@ -91,8 +92,8 @@ try
                 end
             end
             
-            if isfield(param, 'OUTPUTFILE')
-                OutputFile = param.OUTPUTFILE;
+            if isfield(param, 'OUTPUTFILEPRED')
+                OutputFile = param.OUTPUTFILEPRED;
                 
                 isValid = ischar(OutputFile) && ...
                     ~isempty(OutputFile) && ...
@@ -104,8 +105,8 @@ try
                 end
             end
             
-             if isfield(param, 'OUTPUTFILEMAT')
-                OutputFileMat = param.OUTPUTFILEMAT;
+             if isfield(param, 'OUTPUTFILECLASS')
+                OutputFileMat = param.OUTPUTFILECLASS;
                 
                 isValid = ischar(OutputFileMat) && ...
                     ~isempty(OutputFileMat) && ...
@@ -156,7 +157,21 @@ if exitCode == 0
     
     % ======================
     % Read-in training data
-    ppr_parse_training_json(TrainingDataFile)
+%     ppr_parse_training_json(TrainingDataFile)
+    
+    
+    trainingResults = load(TrainingDataFile);
+    
+    % ** NOTE **
+    % Without this unused variable, MATLAB cannot find mgPlsda when being
+    % called from R
+    unused = mgPlsda;
+    
+    TrainingResults.spotID = trainingResults.spotID;
+    TrainingResults.finalModel = trainingResults.aTrainedPls;
+    
+    
+%     TrainingResults = aTrainingPls;
     
     
 end

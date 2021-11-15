@@ -7,13 +7,23 @@ raw = fread(fid, inf);
 str = char(raw');
 fclose(fid);
 
+disp(str);
+
 jsonParams = jsondecode(str);
+
+disp(jsonParams );
 
 % cvResults  = '';
 finalModel = '';
 spotID     = {};
 for i = 1:length(jsonParams)
-    obj = jsonParams{i};
+
+    try
+        obj = jsonParams{i};
+    catch err
+        obj = jsonParams(i);
+    end
+
 %     disp( obj.obj_type )
     if isfield(obj, 'obj_type')
         % Final training model object
@@ -24,12 +34,12 @@ for i = 1:length(jsonParams)
             finalModel.finish_init();           
         end
         
-%         if strcmpi( obj.obj_type, 'cvResults')
-%             cvObj = obj.obj_data;
-%             cvRes = cvResults;
-%             cvRes = set_obj_fields( cvRes, cvObj );
-%         end
-%         
+        if strcmpi( obj.obj_type, 'cvResults')
+            cvObj = obj.obj_data;
+            cvRes = cvResults;
+            cvRes = set_obj_fields( cvRes, cvObj );
+        end
+        
         if strcmpi( obj.obj_name, 'SpotID')
             spotID = obj.data;
         
@@ -39,6 +49,7 @@ end
 
 TrainingResults.spotID = spotID;
 TrainingResults.finalModel = finalModel;
+disp(finalModel)
 % ~isfield(classifier, 'spotID') || ~isfield(classifier, 'finalModel')
 end
 

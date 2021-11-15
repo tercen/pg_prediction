@@ -7,7 +7,7 @@ function [exitCode, X, y, spotID, strLabel] = ppr_data_format()
     
     if any(isnan(X(:)))
         exitCode = -7;
-        pgp_util_error_message(exitCode);
+        ppr_util_error_message(exitCode);
         return
 %         error('Missing values are not allowed');
         
@@ -22,7 +22,7 @@ function [exitCode, X, y, spotID, strLabel] = ppr_data_format()
     
     if length(yName) ~= 1
         exitCode = -8;
-        pgp_util_error_message(exitCode);
+        ppr_util_error_message(exitCode);
         return
 %         error('Grouping must be defined using exactly one data color');
     end
@@ -32,7 +32,7 @@ function [exitCode, X, y, spotID, strLabel] = ppr_data_format()
     nGroups = length(unique(y));
     if nGroups < 2
         exitCode = -9;
-        pgp_util_error_message(exitCode);
+        ppr_util_error_message(exitCode);
         return
 %         error('Grouping must contain at least two different levels');
     end
@@ -42,7 +42,7 @@ function [exitCode, X, y, spotID, strLabel] = ppr_data_format()
     bID = strcmpi('Spot', varType) & strcmpi('ID', varNames);
     if sum(bID) ~= 1
         exitCode = -10;
-        pgp_util_error_message(exitCode);
+        ppr_util_error_message(exitCode);
         return
 %         error('Spot ID could not be retrieved')
     end

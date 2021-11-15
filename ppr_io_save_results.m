@@ -7,15 +7,25 @@ global TrainingResults;
 classifier = TrainingResults;
 
 
-
 %-------------------------------------------
 % Saving prediction results
 %-------------------------------------------
 if ~isempty(OutputFileMat)
+    
+    cvResults = cv;
+    % Both can be recovered from the operator
+%     inputX   = X;
+% classifier = lastUsed;
+    save(OutputFileMat, 'cvResults');
+end
+
+
+if ~isempty(OutputFile)
+    % Start by 0 index
     aHeader{1}    = 'rowSeq';
-    aNumeric(:,1) = double(data.rowSeq);
+    aNumeric(:,1) = double(data.rowSeq - 1);
     aHeader{2}    = 'colSeq';
-    aNumeric(:,2) = double(data.colSeq);
+    aNumeric(:,2) = double(data.colSeq - 1);
 
     lIdx = sub2ind(size(X'), data.rowSeq, data.colSeq); % linear index for converting matrix to flat output
 
@@ -46,7 +56,6 @@ if ~isempty(OutputFileMat)
             fprintf(fid, ',');
         end
     end
-
     fclose(fid);
 
 
@@ -79,7 +88,7 @@ jsonStr = cat(2, jsonStr, ']');
 
 [dirPath, ~, ~] = fileparts(OutputFile);
 
-if ~exist(dirPath, 'dir')
+if ~exist(dirPath, 'dir') && ~isempty(dirPath)
     mkdir(dirPath);
 end
 
