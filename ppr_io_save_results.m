@@ -15,8 +15,8 @@ if ~isempty(OutputFileMat)
     cvResults = cv;
     % Both can be recovered from the operator
     inputX   = X;
-    classifier = lastUsed;
-    save(OutputFileMat, 'cvResults', 'inputX', 'classifier');
+    %classifier = lastUsed;
+    save(OutputFileMat, 'cvResults', 'inputX', 'lastUsed');
 end
 
 
